@@ -58,7 +58,7 @@ class MBAgent(BaseAgent):
             next_observations = next_ob_no[start_idx:end_idx]
 
             # use datapoints to update one of the dyn_models
-            model = self.dyn_models[i] =  # TODO(Q1)
+            model = self.dyn_models[i]   # TODO(Q1)
             log = model.update(observations, actions, next_observations,
                                 self.data_statistics)
             loss = log['Training Loss']
