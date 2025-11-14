@@ -67,19 +67,22 @@ class MPCPolicy(BasePolicy):
             elite_mean = None
             elite_std = None
             for i in range(self.cem_iterations):
-              if i == 0:
+                if i == 0:
                     candidate_sequences = np.random.uniform(
                         self.low,
                         self.high,
                         size=(self.N, self.horizon, self.ac_dim)
                     )
-              else:
-                candidate_sequences = np.random.normal(
+                else:
+                    candidate_sequences = np.random.normal(
                         elite_mean,
                         elite_std,
                         size=(self.N, self.horizon, self.ac_dim)
                     )
-                    candidate_sequences = np.clip(candidate_sequences, self.low, self.high)
+                candidate_sequences = np.clip(candidate_sequences, self.low, self.high)
+                predicted_rewards = self.evaluate_candidate_sequences(candidate_sequences, obs)
+                elite_indices = np.argsort(predicted_rewards)[-self.cem_num_elites:]
+                elite_sequences = candidate_sequences[elite_indices]
                 # - Sample candidate sequences from a Gaussian with the current 
                 #   elite mean and variance
                 #     (Hint: remember that for the first iteration, we instead sample
@@ -88,10 +91,6 @@ class MPCPolicy(BasePolicy):
                 #     (Hint: what existing function can we use to compute rewards for
                 #      our candidate sequences in order to rank them?)
                 # - Update the elite mean and variance
-                predicted_rewards = self.evaluate_candidate_sequences(candidate_sequences, obs)
-                elite_indices = np.argsort(predicted_rewards)[-self.cem_num_elites:]
-                elite_sequences = candidate_sequences[elite_indices]
-                
                 # - Update the elite mean and variance
                 new_mean = np.mean(elite_sequences, axis=0)
                 new_std = np.std(elite_sequences, axis=0)
